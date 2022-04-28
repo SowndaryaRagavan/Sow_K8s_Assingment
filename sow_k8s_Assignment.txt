@@ -35,7 +35,7 @@
 		® Totally we have five module in the voting app (vote, result, db, redis, worker)
 		® 5-pods, deployment, replicaset created.
 		® 4-service created for vote, result, db, redis.
-		® No service has been created for worker node because no service is requested to worker, it is just getting the result from redis and handing over it to db.
+		® No service has been created for worker node because no service is requested to worker, it is just getting the result from redis and handing over 			it to db pod.
 		® The type of vote and result module is Nodeport because these both going to be running in web server which is to be accessed by the public.
 		® When deleting voter pod, new pod created immediately and the result page was fine. But the container ID is the one newly created.
 		® Same happened for worker node. New pod created immediately and the result page was seamlessly running.
