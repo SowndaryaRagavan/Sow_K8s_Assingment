@@ -1,0 +1,45 @@
+	1) DaemonSet:
+		When there is a requirement to run the pod in all the worker node, then DS comes into picture. Whereas RS will maintain the desired and current state for the existing worker nodes.
+		Ex Scenario : Getting the health report from all the nodes.
+		
+	2) Image update:
+		[root@ip-172-31-28-64 09-deployments]# kubectl apply -f kubia-deployment-v2.yaml
+		[root@ip-172-31-28-64 09-deployments]# kubectl get po
+		
+		[root@ip-172-31-28-64 09-deployments]# curl 192.168.20.57:8080
+			This is v2 running in pod kubia-7d5c456ffc-2wz9c
+		
+		[root@ip-172-31-28-64 09-deployments]# kubectl set image deployment kubia nodejs=luksa/kubia:v3
+			deployment.apps/kubia image updated
+		
+		[root@ip-172-31-28-64 09-deployments]# kubectl get po
+			NAME                     READY   STATUS              RESTARTS   AGE
+			kubia-79b84b44f4-64sfw   0/1     ContainerCreating   0          5s
+			kubia-7d5c456ffc-2wz9c   1/1     Running             0          9m55s
+		[root@ip-172-31-28-64 09-deployments]# kubectl get rs
+			NAME               DESIRED   CURRENT   READY   AGE
+			kubia-79b84b44f4   1         1         1       9s
+			kubia-7d5c456ffc   0         0         0       9m59s
+			
+		[root@ip-172-31-28-64 09-deployments]# curl 192.168.20.46:8080
+			This is v3 running in pod kubia-79b84b44f4-64sfw
+			
+	3) Service:
+		First I will check all the pods and services are created and running.
+		Then, the Nodeport address and port number which is mentioned in the yaml file are properly matching with what we are giving in the browser or not.
+		
+	4) Voting app - Assignment:
+		[root@ip-172-31-28-64 k8s-specifications]# kubectl apply -f .
+		[root@ip-172-31-28-64 k8s-specifications]# kubectl get po
+	Observation:
+		® Totally we have five module in the voting app (vote, result, db, redis, worker)
+		® 5-pods, deployment, replicaset created.
+		® 4-service created for vote, result, db, redis.
+		® No service has been created for worker node because no service is requested to worker, it is just getting the result from redis and handing over it to db.
+		® The type of vote and result module is Nodeport because these both going to be running in web server which is to be accessed by the public.
+		® When deleting voter pod, new pod created immediately and the result page was fine. But the container ID is the one newly created.
+		® Same happened for worker node. New pod created immediately and the result page was seamlessly running.
+		® On deleting db pod, new db pod was created but the result page was not updating  but changes are captured.
+		
+
+		To fix this, if we delete result pod, it will create new pod by pulling the saved data from db. So it will be fine.
